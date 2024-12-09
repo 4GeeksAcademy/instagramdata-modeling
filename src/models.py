@@ -7,49 +7,39 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Username(Base):
-  __tablename__ = 'username'
-  id = Column(Integer, primary_key=True)
-  username = Column(String(20), nullable=False)
-  name = Column(String(25), nullable=False)
-  bio = Column(String(250), nullable=True)
-  email = Column(String(200), nullable=False)
-  password = Column(String(20), nullable=False)
-  phone_number = Column(Integer, nullable=False)
-  
-class Story(Base):
-  __tablename__ = 'story'
-  id = Column(Integer, primary_key=True)
-  views = Column(Integer, nullable=False)
-  caption = Column(String(250), nullable=True)
-  shares = Column(Integer, nullable=True)
-  media_url = Column(String(80))
+class Users(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    user_name = Column(String(30), nullable=False)
+    firstname = Column(String(20), nullable=False)
+    lastname = Column(String(20), nullable=False)
+    email = Column(String, nullable=False, unique=True)
+
+class Follower(Base):
+    __tablename__ = 'follower'
+    id = Column(Integer, primary_key=True)
+    User_from_id = Column(Integer, ForeignKey('users.id')) 
+    User_to_id = Column(Integer, ForeignKey('users.id')) 
+    user_from = relationship(Users)
+    
 
 class Post(Base):
-  __tablename__= 'post'
-  id = Column(Integer, primary_key=True)
-  photo_id = Column(Integer, nullable=False)
-  caption = Column(String(250), nullable=True)
-  likes = Column(Integer, nullable=True)
-  comment = Column(String(250), nullable=True)
-  shares = Column(Integer)
+    __tablename__ = 'post'
+    id = Column(Integer, primary_key=True)
+    User_id = Column(Integer, ForeignKey('users.id'))
+    users = relationship(Users) 
+    url_image = Column(String(2048), nullable=False)
+    created_at = Column(Integer, nullable=False)
 
-class Followers(Base):
-  __tablename__= 'followers'
-  id = Column(Integer, primary_key=True)
-  name = Column(String(25), nullable=False)
-  email = Column(String(200), nullable=False)
-  password = Column(String(20), nullable=False)
-  bio = Column(String(250))
-  phone_number = Column(Integer, nullable=False)
 
-class User(Base):
-  __tablename__= 'user'
-  id = Column(Integer, primary_key=True)
-  username_id = Column(Integer, ForeignKey('username.id'))
-  story_id = Column(Integer, ForeignKey('story.id'))
-  post_id = Column(Integer, ForeignKey('post.id'))
-  followers_id = Column(Integer, ForeignKey('followers.id'))
+class Comment(Base):
+    __tablename__ = 'comment'
+    id = Column(Integer, primary_key=True)
+    comment = Column(String(300))
+    post_id = Column(Integer, ForeignKey('post.id'))
+    post = relationship(Post)
+    author_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship(Users)
 
 
 def to_dict(self):
